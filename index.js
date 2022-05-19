@@ -24,18 +24,8 @@ async function run() {
         const taskCollection = client.db('ToDo-App').collection('ToDoTask');
         console.log('connected to db successfully');
 
-        //get api to read all notes
-        // http://localhost:5000/inventories
 
-        app.get("/inventories", async (req, res) => {
-            const q = req.query;
-            const cursor = inventoryCollection.find(q);
-            const result = await cursor.toArray();
-            console.log(q);
-            res.send(result);
-        })
-
-        //get api for a user's added items
+        //get api for a user's added todo
 
         app.get("/user-todo", async (req, res) => {
             const email=req.query.email;
@@ -60,6 +50,27 @@ async function run() {
 
         })
 
+        // update notes api
+        // http://localhost:5000/product/62754395b1c6026d9cb9ce66
+        app.put('/todo/:id',async(req,res)=>{
+            const id = req.params.id;
+            const data = req.body;
+            console.log('from update api',data);
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: {
+                    // userName: data.userName,
+                    // textData: data.textData,
+                    ...data
+                },
+              };
+              const result = await taskCollection.updateOne(filter, updateDoc, options);
+
+            console.log('from put method', id);
+            res.send(result);
+        })
 
 
 
